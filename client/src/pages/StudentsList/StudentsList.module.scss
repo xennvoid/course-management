@@ -1,0 +1,21 @@
+.list { 
+    margin: 2rem 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+        counter-increment: step-counter;
+        margin-bottom: 10px;
+
+        &::before {
+            content: counter(step-counter);
+            margin-right: 5px;
+            font-size: 80%;
+            background-color: rgb(52 98 98);
+            color: white;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 3px;
+          }
+    }
+}
