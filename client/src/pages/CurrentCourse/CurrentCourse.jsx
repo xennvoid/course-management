@@ -1,44 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { NavLink, useParams } from 'react-router-dom';
+import { NavLink, useNavigate, useParams } from 'react-router-dom';
 import MyTitle from '../../components/UI/MyTitle/MyTitle';
-import { deleteCourseByID, deleteStoreCourse, getCourseByUid } from '../../store/slices/coursesSlice';
-import { getAllStudents } from '../../store/slices/studentsSlice';
+import { deleteCourseByID, deleteStoreCourse, getCourseByID } from '../../store/slices/coursesSlice';
 import styles from './CurrentCourse.module.scss';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const CurrentCourse = () => {
 
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const dispatch = useDispatch();
     const { currentCourse, loading } = useSelector(state => state.courses);
-    const { students } = useSelector(state => state.students);
     const [courseStudents, setCourseStudents] = useState(null);
 
     useEffect(() => {
-        dispatch(getCourseByUid(id));
-        dispatch(getAllStudents());
+        dispatch(getCourseByID(id));
+
+        const getSubscribedStudents = async () => {
+            const response = await axios.get(`http://localhost:5000/api/courses/${id}/students`);
+            const res = await response.data;
+            setCourseStudents(res);
+        }
+
+        getSubscribedStudents();
+
     }, []);
-
-    useEffect(() => {
-        setCourseStudents(students?.filter(student => {
-
-            const course = student.student_course?.toLowerCase();
-            const presentCourse = currentCourse?.course_name?.toLowerCase();
-
-            if (course.includes(presentCourse))
-                return student;
-            return;
-
-        }));
-    }, [students])
 
     const deleteCourse = () => {
         dispatch(deleteStoreCourse(currentCourse.course_id));
-        dispatch(deleteCourseByID(currentCourse.uid));
+        dispatch(deleteCourseByID(id));
+        navigate(-1, { replace: true });
         toast.success(`${currentCourse.course_name.toUpperCase()} course was successfully deleted!`, { autoClose: 3000, pauseOnHover: false });
     }
+
+    console.log(courseStudents)
 
     return (
         !loading &&
@@ -56,7 +54,7 @@ const CurrentCourse = () => {
                             <ol className={styles.students_list}>
                                 {courseStudents?.map(student =>
                                     <li
-                                        key={student.uid}
+                                        key={student.student_id}
                                         className={styles.students_item}>
                                         {student.student_name}
                                     </li>

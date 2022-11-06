@@ -19,7 +19,7 @@ const Courses = () => {
             <MyTitle>Courses control panel</MyTitle>
             <ul className={styles.list}>
                 {
-                    courses.map(course => <Course key={course.uid} courseName={course.course_name} courseId={course.course_id} courseUid={course.uid} />)
+                    courses.map(course => <Course key={course.course_id} courseName={course.course_name} courseId={course.course_id} />)
                 }
             </ul>
         </div>

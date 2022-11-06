@@ -8,12 +8,12 @@ import { getAllCourses } from '../../store/slices/coursesSlice';
 import { addNewStudent } from '../../store/slices/studentsSlice';
 import Form from '../../components/UI/Form/Form';
 import MyTitle from '../../components/UI/MyTitle/MyTitle';
+import Grades from '../../components/Grades/Grades';
 
 
 const initialState = {
     studentName: "",
     studentAge: 17,
-    studentCourses: [],
 };
 
 const StudentAdd = () => {
@@ -23,6 +23,8 @@ const StudentAdd = () => {
     const { courses } = useSelector(state => state.courses);
 
     const [formData, setFormData] = useState(initialState);
+
+    const [selectedCourses, setSelectedCourses] = useState([]);
 
     const selectInputRef = useRef(null);
 
@@ -58,7 +60,7 @@ const StudentAdd = () => {
         dispatch(addNewStudent({
             name: formData.studentName,
             age: formData.studentAge,
-            courses: formData.studentCourses,
+            courses: selectedCourses,
             className: "545"
         }));
         toast.success(`${formData.studentName.toUpperCase()} student was added!`, { autoClose: 2000, pauseOnHover: false, hideProgressBar: true });
@@ -67,20 +69,28 @@ const StudentAdd = () => {
     }
 
     const handleSelect = (selectedOptions) => {
-        let courses = Array.from(selectedOptions, option => option.value);
-        setFormData({ ...formData, studentCourses: courses });
+        let selectedCoursesLabels = Array.from(selectedOptions, option => option.label);
+
+        let coursesSelected = selectedCoursesLabels.map(selectedCourseLabel => {
+            let matchedCourse = courses.find(course => course.course_name === selectedCourseLabel);
+
+            const existingCourse = selectedCourses.find(course => course.course_id === matchedCourse.course_id);
+
+            return existingCourse ? existingCourse : ({ course_name: selectedCourseLabel, course_id: matchedCourse.course_id, course_grade: 0 });
+        });
+
+        setSelectedCourses(coursesSelected);
     }
 
     useEffect(() => {
         dispatch(getAllCourses());
     }, []);
 
-
     return (
         <>
             <MyTitle>Add a new student</MyTitle>
             <Form formData={formData} setFormData={setFormData} onSubmit={(e) => handleSubmit(e)} inputs={inputs} submitText={"Add a new student"}>
-                <label htmlFor="courses" className={styles.label}>Courses</label>
+                <label htmlFor="courses" className={styles.label}>Subjects:</label>
                 <Select
                     ref={selectInputRef}
                     isMulti
@@ -90,9 +100,16 @@ const StudentAdd = () => {
                     classNamePrefix="select"
                     onChange={handleSelect}
                 />
+
+                {
+                    selectedCourses?.length > 0
+                        ?
+                        <Grades selectedCourses={selectedCourses} setSelectedCourses={setSelectedCourses} />
+                        : null
+                }
             </Form>
         </>
     )
 }
 
-export default StudentAdd
+export default StudentAdd;

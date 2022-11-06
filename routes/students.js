@@ -2,11 +2,9 @@ const express = require("express");
 const router = express.Router();
 const slugify = require("slugify");
 const db = require("../config/db");
-const uuid = require('uuid').v4;
+
 
 router.post("/create", (req, res) => {
-
-    console.log(req.body);
 
     const { name, age, courses, className } = req.body;
 
@@ -17,7 +15,9 @@ router.post("/create", (req, res) => {
 
     // sql for user
     let sqlCheck = `SELECT * from students WHERE slug = ?`;
-    let sql = "INSERT INTO students SET ?";
+    let sqlInsertStudent = "INSERT INTO students SET ?;";
+
+    let sqlInsertCourses = new Array(courses.length).fill("INSERT INTO joined_courses SET ?;").join('');
 
     const slug = slugify(name).toLowerCase();
 
@@ -27,76 +27,149 @@ router.post("/create", (req, res) => {
 
         const data = {
             student_name: name,
-            uid: uuid(),
             slug,
             student_age: age.toString(),
-            student_course: courses.toString().toLowerCase(),
-            student_class: className.toLowerCase(),
+            student_courses: courses.map(course => course.course_name).join(','),
+            student_class: className,
         };
 
-        db.query(sql, data, (err) => {
+        db.query(sqlInsertStudent, data, (err, result) => {
             if (err) {
                 return res.status(401).json({ msg: "Unable to store data" });
             }
 
-            return res.status(200).json({ data });
+            const insertID = result.insertId;
+
+            const joinedCourses = courses?.map(course => ({ student_id: insertID, course_id: course.course_id, grade: course.course_grade }));
+
+            db.query(sqlInsertCourses, [...joinedCourses], (err, result) => {
+                if (err) {
+                    return res.status(401).json({ msg: "Unable to store data" });
+                }
+
+                return res.status(200).json({ data });
+            });
         });
     });
 });
+
+/**
+    Get all students
+**/
 
 router.get("/", (req, res) => {
     let getQuery = `SELECT * FROM students`;
 
     db.query(getQuery, (err, result) => {
+
+        if (!result) return res.status(200).json([]);
+
         return res.status(200).json(result);
     });
 });
 
+/**
+    Get student by id
+**/
+
+router.get("/:id", (req, res) => {
+
+    const { id } = req.params;
+
+    let getSingle = `SELECT * FROM students WHERE student_id = ?`;
+
+    db.query(getSingle, id, (err, result) => {
+        return res.status(200).json(result);
+    });
+});
+
+/**
+    Get student courses
+**/
+
+router.get("/:id/courses", (req, res) => {
+
+    const { id } = req.params;
+
+    let getCoursesByStudentIDQuery = `SELECT * FROM joined_courses WHERE student_id = ?;`;
+
+    let getQueryCourses = `SELECT * FROM courses WHERE course_id = ? UNION `;
+
+    db.query(getCoursesByStudentIDQuery, id, (err, results) => {
+
+        if (err) return res.status(400).json({ msg: "Get data error" });
+
+        const coursesIDs = results.map(res => res.course_id);
+
+        const grades = results.map(res => res.grade);
+
+        let getCoursesByIDsQuery = new Array(results.length).fill(getQueryCourses).join('').slice(0, -6); // concating results data into 1 array, deleting UNION str at the end
+
+        db.query(getCoursesByIDsQuery, [...coursesIDs], (err, results) => {
+
+            if (!results) return res.status(200).json([]);
+
+            if (err) return res.status(400).json({ msg: "Get data error" });
+
+            const data = grades.map((grade, i) => ({ ...results[i], course_grade: grade }));
+
+            return res.status(200).json(data);
+        });
+    });
+});
+
+/** 
+    Update student
+**/
+
 router.put("/", (req, res) => {
-    const { name, age, courses, className, uid } = req.body;
+
+    const { id, name, age, courses, className } = req.body;
     const newSlug = slugify(name).toLowerCase();
 
-    const updatedata =
-        "UPDATE students SET student_name = ?, student_age = ?, student_course = ?, student_class = ?, slug = ? WHERE uid = ?";
+    console.log(req.body)
+
+    const updatedata = "UPDATE students SET student_name = ?, student_age = ?, student_courses = ?, student_class = ?, slug = ? WHERE student_id = ?";
+
+    let updateCourses = "DELETE FROM joined_courses WHERE student_id = ?;"
+
+    let sqlInsertCourses = new Array(courses.length).fill("INSERT INTO joined_courses SET ?;").join('');
 
     db.query(
         updatedata,
         [
             name,
             age,
-            courses.toString(),
+            courses.map(course => course.course_name).toString(),
             className.toLowerCase(),
             newSlug,
-            uid,
+            id
         ],
-        function (error) {
+        (error) => {
             if (error) return res.status(400).json({ msg: "Unable to update" });
 
-            res
-                .status(200)
-                .json({ name, age, courses, className, newSlug, updated: true, uid });
+            db.query(updateCourses, id, (error, result) => {
+
+                const joinedCourses = courses?.map(course => ({ student_id: id, course_id: course.course_id, grade: course.course_grade }));
+
+                db.query(sqlInsertCourses, [...joinedCourses], (error, result) => {
+
+                    if (error) return res.status(400).json({ msg: "Unable to update" });
+
+                    return res.status(200).json({ name, age, courses, className, newSlug, updated: true, id });
+                });
+            });
         }
     );
 });
 
-router.get("/:uid", (req, res) => {
+router.delete("/:id", (req, res) => {
 
-    const { uid } = req.params;
+    const { id } = req.params;
 
-    console.log(uid)
+    let deleteQuery = "DELETE FROM joined_courses WHERE student_id = ?; DELETE FROM students WHERE student_id = ?;";
 
-    let getSingle = `SELECT * FROM students WHERE uid = ?`;
-
-    db.query(getSingle, [uid], (err, result) => {
-        console.log(result)
-        return res.status(200).json(result);
-    });
-});
-
-router.delete("/:uid", (req, res) => {
-    const { uid } = req.params;
-    let delQuery = "DELETE FROM students WHERE uid = ?";
-    db.query(delQuery, [uid], (err) => {
+    db.query(deleteQuery, [id, id], (err) => {
         if (err) {
             res.send(err).status(400);
         } else {

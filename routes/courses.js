@@ -22,7 +22,6 @@ router.post("/create", (req, res) => {
         if (course.length > 0) return res.status(400).json({ msg: "Course exists" });
 
         const data = {
-            uid: uuid(),
             course_name: courseName,
             slug: slugString,
         }
@@ -35,6 +34,7 @@ router.post("/create", (req, res) => {
         })
     })
 });
+
 
 /*
     Get all courses
@@ -49,19 +49,19 @@ router.get("/", (req, res) => {
 
         return res.status(200).json(results);
     })
-})
+});
 
 /* 
     Get course by ID
 */
 
-router.get("/:uid", (req, res) => {
+router.get("/:id", (req, res) => {
 
-    const { uid } = req.params;
+    const { id } = req.params;
 
-    let dbGetQuery = `SELECT * FROM courses WHERE uid = ?`;
+    let dbGetQuery = `SELECT * FROM courses WHERE course_id = ?`;
 
-    db.query(dbGetQuery, [uid], (err, result) => {
+    db.query(dbGetQuery, id, (err, result) => {
 
         if (err) return res.status(400).json({ msg: "Get course data error" });
 
@@ -70,18 +70,49 @@ router.get("/:uid", (req, res) => {
 })
 
 /*
+    Get course students
+*/
+
+router.get("/:id/students", (req, res) => {
+
+    const { id } = req.params;
+
+    let dbGetQuery = `SELECT * FROM joined_courses WHERE course_id = ?;`;
+
+    let getQuery = `SELECT * FROM students WHERE student_id = ? UNION `;
+
+    db.query(dbGetQuery, id, (err, results) => {
+
+        if (err) return res.status(400).json({ msg: "Get data error" });
+
+        const studentIDs = results.map(res => res.student_id);
+
+        let getStudentsQuery = new Array(results.length).fill(getQuery).join('').slice(0, -6); // concating results data into 1 array, deleting UNION str at the end
+
+        db.query(getStudentsQuery, [...studentIDs], (err, results) => {
+
+            if (!results) return res.status(200).json([]);
+
+            if (err) return res.status(400).json({ msg: "Get data error" });
+
+            return res.status(200).json(results);
+        });
+    });
+});
+
+/*
     Delete course
 */
 
 router.delete("/", (req, res) => {
 
-    const { uid } = req.body;
+    const { id } = req.body;
 
-    console.log(req.body)
+    let sqlDbDelete = "DELETE FROM joined_courses WHERE course_id = ?; DELETE FROM courses WHERE course_id = ?;";
 
-    let sqlDbDelete = "DELETE FROM courses WHERE uid = ?";
+    db.query(sqlDbDelete, [id, id], (err, results) => {
 
-    db.query(sqlDbDelete, uid, (err, results) => {
+        console.log(results)
 
         if (err) return res.status(400).json({ msg: "Delete course error" });
 
@@ -98,14 +129,7 @@ router.put("/", (req, res) => {
 
     const { courseName, students, slug } = req.body;
 
-    console.log(req.body)
-
     const newSlug = slugify(courseName).toLowerCase();
-
-    console.log(newSlug)
-
-    if (students.length == 0)
-        return res.status(400).json({ msg: "Add students to this course" });
 
     let sqlDbUpdate = `UPDATE courses SET course_name = ?, course_students = ?, slug = ? WHERE slug = ?`;
 

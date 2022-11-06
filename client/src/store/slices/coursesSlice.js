@@ -25,12 +25,12 @@ export const getAllCourses = createAsyncThunk(
         }
     })
 
-export const getCourseByUid = createAsyncThunk(
+export const getCourseByID = createAsyncThunk(
     'courses/getCourseByUid',
-    async (uid, thunkAPI) => {
+    async (id, thunkAPI) => {
         try {
 
-            const response = await axios.get(`http://localhost:5000/api/courses/${uid}`);
+            const response = await axios.get(`http://localhost:5000/api/courses/${id}`);
 
             if (response.status !== 200)
                 throw thunkAPI.rejectWithValue(response.status)
@@ -69,12 +69,11 @@ export const createCourse = createAsyncThunk(
         }
     })
 
+
 export const deleteCourseByID = createAsyncThunk(
     'courses/deleteCourseByID',
-    async (uid, thunkAPI) => {
+    async (id, thunkAPI) => {
         try {
-
-            const body = JSON.stringify(uid);
 
             const response = await axios({
                 method: "DELETE",
@@ -85,7 +84,7 @@ export const deleteCourseByID = createAsyncThunk(
                     "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS"
                 },
                 data: {
-                    uid
+                    id
                 }
             });
 
@@ -122,14 +121,14 @@ const coursesSlice = createSlice({
                 state.loading = false;
             })
         builder
-            .addCase(getCourseByUid.fulfilled, (state, action) => {
+            .addCase(getCourseByID.fulfilled, (state, action) => {
                 state.loading = false;
                 state.currentCourse = action.payload;
             })
-            .addCase(getCourseByUid.pending, (state) => {
+            .addCase(getCourseByID.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(getCourseByUid.rejected, (state, action) => {
+            .addCase(getCourseByID.rejected, (state, action) => {
                 state.error = action.payload;
                 state.loading = false;
             })

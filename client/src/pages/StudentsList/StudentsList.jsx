@@ -19,7 +19,7 @@ const StudentsList = () => {
             <MyTitle className={styles.title}>Manage Students</MyTitle>
             <ul className={styles.list}>
                 {
-                    students.map(student => <StudentCard key={student.uid} student={student} />)
+                    students?.map(student => <StudentCard key={student.student_id} student={student} />)
                 }
             </ul>
         </div>

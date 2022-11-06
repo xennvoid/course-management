@@ -8,6 +8,7 @@ connectDatabase = () => {
       database: process.env.DBNAME,
       user: process.env.DBUSER,
       password: "password",
+      multipleStatements: true,
     });
     db.connect(function (err) {
       if (!err) {

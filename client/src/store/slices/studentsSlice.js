@@ -50,13 +50,13 @@ export const addNewStudent = createAsyncThunk(
         }
     })
 
-export const getStudentByUid = createAsyncThunk(
-    'students/getStudentByUid',
-    async (studentUid, thunkAPI) => {
+export const getStudentByID = createAsyncThunk(
+    'students/getStudentByID',
+    async (studentID, thunkAPI) => {
         try {
             const response = await axios({
                 method: "GET",
-                url: `http://localhost:5000/api/students/${studentUid}`,
+                url: `http://localhost:5000/api/students/${studentID}`,
                 headers: {
                     "Content-Type": 'application/json',
                 },
@@ -98,13 +98,13 @@ export const updateStudent = createAsyncThunk(
         }
     })
 
-export const deleteStudentByUid = createAsyncThunk(
-    'students/deleteStudentByUid',
-    async (studentUid, thunkAPI) => {
+export const deleteStudentFromDB = createAsyncThunk(
+    'students/deleteStudentByID',
+    async (studentID, thunkAPI) => {
         try {
             const response = await axios({
                 method: "DELETE",
-                url: `http://localhost:5000/api/students/${studentUid}`,
+                url: `http://localhost:5000/api/students/${studentID}`,
                 headers: {
                     "Content-Type": 'application/json',
                 },
@@ -126,7 +126,7 @@ const studentsSlice = createSlice({
     initialState,
     reducers: {
         deleteStoreStudent: (state, action) => {
-            state.students = state.students.filter(student => student.uid !== action.payload);
+            state.students = state.students.filter(student => student.student_id !== action.payload);
         },
     },
     extraReducers: (builder) => {
@@ -143,14 +143,14 @@ const studentsSlice = createSlice({
                 state.loading = false;
             })
         builder
-            .addCase(getStudentByUid.fulfilled, (state, action) => {
+            .addCase(getStudentByID.fulfilled, (state, action) => {
                 state.loading = false;
                 state.currentStudent = action.payload;
             })
-            .addCase(getStudentByUid.pending, (state) => {
+            .addCase(getStudentByID.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(getStudentByUid.rejected, (state, action) => {
+            .addCase(getStudentByID.rejected, (state, action) => {
                 state.error = action.payload;
                 state.loading = false;
             })
