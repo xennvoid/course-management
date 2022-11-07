@@ -29,7 +29,6 @@ router.post("/create", (req, res) => {
             student_name: name,
             slug,
             student_age: age.toString(),
-            student_courses: courses.map(course => course.course_name).join(','),
             student_class: className,
         };
 
@@ -129,7 +128,7 @@ router.put("/", (req, res) => {
 
     console.log(req.body)
 
-    const updatedata = "UPDATE students SET student_name = ?, student_age = ?, student_courses = ?, student_class = ?, slug = ? WHERE student_id = ?";
+    const updatedata = "UPDATE students SET student_name = ?, student_age = ?, student_class = ?, slug = ? WHERE student_id = ?";
 
     let updateCourses = "DELETE FROM joined_courses WHERE student_id = ?;"
 
@@ -140,7 +139,6 @@ router.put("/", (req, res) => {
         [
             name,
             age,
-            courses.map(course => course.course_name).toString(),
             className.toLowerCase(),
             newSlug,
             id

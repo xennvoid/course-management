@@ -9,7 +9,7 @@ const StudentCard = ({ student }) => {
 
     const dispatch = useDispatch();
 
-    const { student_id, student_name, student_age, student_courses } = student;
+    const { student_id, student_name, student_age } = student;
 
     const navigate = useNavigate();
 
@@ -27,10 +27,6 @@ const StudentCard = ({ student }) => {
             <span className={styles.age}>
                 <span>Age: </span>
                 <span className={styles.value}>{student_age}</span>
-            </span>
-            <span className={styles.courses}>
-                <span>Courses: </span>
-                <span className={styles.value}>{student_courses?.length ? student_courses : "No courses"}</span>
             </span>
             <MdRemove
                 size={30}

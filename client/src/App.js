@@ -6,7 +6,7 @@ import Box from './components/Box/Box';
 import CourseCreate from './pages/CourseCreate/CourseCreate';
 import { ToastContainer } from 'react-toastify';
 import StudentAdd from './pages/StudentAdd/StudentAdd';
-import StudentsList from './pages/StudentsList/StudentsList';
+import StudentList from './pages/StudentList/StudentList';
 import StudentUpdate from './pages/StudentUpdate/StudentUpdate';
 import CurrentCourse from './pages/CurrentCourse/CurrentCourse';
 import Header from './components/Header/Header';
@@ -24,7 +24,7 @@ const App = () => {
               <Route index element={<Home />} />
               <Route path="create" element={<p>qwerty</p>} />
               <Route path="manage/courses" element={<Courses />} />
-              <Route path="manage/students" element={<StudentsList />} />
+              <Route path="manage/students" element={<StudentList />} />
               <Route path="add/course" element={<CourseCreate />} />
               <Route path="add/student" element={<StudentAdd />} />
               <Route path="update/student/:id" element={<StudentUpdate />} />

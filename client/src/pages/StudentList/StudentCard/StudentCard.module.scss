@@ -1,6 +1,6 @@
 .card {
     display: grid;
-    grid-template-columns: max-content repeat(3,1fr) 30px;
+    grid-template-columns: max-content repeat(2,1fr) 30px;
     justify-items: center;
     align-items: center;
     gap: 1rem 2rem;
@@ -29,9 +29,6 @@
     
 }
 
-.courses {
-    
-}
 
 .value {
 }

@@ -5,6 +5,7 @@ import MyTitle from '../../components/UI/MyTitle/MyTitle';
 import { deleteCourseByID, deleteStoreCourse, getCourseByID } from '../../store/slices/coursesSlice';
 import styles from './CurrentCourse.module.scss';
 import { toast } from 'react-toastify';
+import { ImCross } from 'react-icons/im';
 import axios from 'axios';
 
 const CurrentCourse = () => {
@@ -36,7 +37,19 @@ const CurrentCourse = () => {
         toast.success(`${currentCourse.course_name.toUpperCase()} course was successfully deleted!`, { autoClose: 3000, pauseOnHover: false });
     }
 
-    console.log(courseStudents)
+    const removeStudentFromCourse = async (studentID) => {
+
+        const response = await axios({
+            method: "DELETE",
+            url: `http://localhost:5000/api/courses/delete/student/${studentID}`,
+            headers: {
+                "Content-Type": 'application/json',
+            },
+            data: { id }
+        });
+
+        setCourseStudents(courseStudents => courseStudents.filter(student => student.student_id !== studentID));
+    }
 
     return (
         !loading &&
@@ -52,11 +65,15 @@ const CurrentCourse = () => {
                         <li>
                             <strong>Course students:</strong>
                             <ol className={styles.students_list}>
-                                {courseStudents?.map(student =>
+                                {courseStudents?.map((student, i) =>
                                     <li
                                         key={student.student_id}
-                                        className={styles.students_item}>
+                                        className={styles.students_item}
+                                        onClick={() => removeStudentFromCourse(student.student_id)}
+                                    >
+                                        <span>{i + 1}.</span>
                                         {student.student_name}
+                                        <ImCross color="red" cursor="pointer" />
                                     </li>
                                 )}
                             </ol>

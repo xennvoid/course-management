@@ -122,6 +122,27 @@ router.delete("/", (req, res) => {
 
 
 /*
+    Delete student from a course
+*/
+
+router.delete("/delete/student/:studentID", (req, res) => {
+
+    const { studentID } = req.params;
+    const { id } = req.body;
+
+    console.log(studentID, id)
+
+    let sqlDbDelete = "DELETE FROM joined_courses WHERE student_id = ? AND course_id = ?;";
+
+    db.query(sqlDbDelete, [studentID, id], (err, results) => {
+
+        if (err) return res.status(400).json({ msg: "Delete student from a course error" });
+
+        return res.status(200).json({ success: true });
+    });
+});
+
+/*
     Update course
 */
 

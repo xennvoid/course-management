@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import MyTitle from '../../components/UI/MyTitle/MyTitle';
 import { getAllStudents } from '../../store/slices/studentsSlice';
 import StudentCard from './StudentCard/StudentCard';
-import styles from './StudentsList.module.scss';
+import styles from './StudentList.module.scss';
 
 const StudentsList = () => {
 
