@@ -78,14 +78,34 @@ export const deleteCourseByID = createAsyncThunk(
             const response = await axios({
                 method: "DELETE",
                 url: "http://localhost:5000/api/courses",
-                headers: {
-                    "Content-Type": 'application/json',
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS"
-                },
                 data: {
                     id
                 }
+            });
+
+            if (response.status !== 200)
+                throw thunkAPI.rejectWithValue(response.status)
+
+            return await response.data;
+
+        } catch (error) {
+            return thunkAPI.rejectWithValue("REQUEST DATA ERROR")
+        }
+    })
+
+export const updateCourse = createAsyncThunk(
+    'courses/updateCourse',
+    async (courseData, thunkAPI) => {
+        try {
+            const body = JSON.stringify(courseData);
+
+            const response = await axios({
+                method: "PUT",
+                url: "http://localhost:5000/api/courses",
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                data: body
             });
 
             if (response.status !== 200)

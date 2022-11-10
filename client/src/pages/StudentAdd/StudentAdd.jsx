@@ -13,7 +13,9 @@ import Grades from '../../components/Grades/Grades';
 
 const initialState = {
     studentName: "",
+    studentEmail: "",
     studentAge: 17,
+    studentGroup: ""
 };
 
 const StudentAdd = () => {
@@ -39,14 +41,28 @@ const StudentAdd = () => {
         },
         {
             id: 2,
+            name: "studentEmail",
+            label: "Email",
+            type: "email",
+            required: true
+        },
+        {
+            id: 3,
             name: "studentAge",
             label: "Age",
             type: "number",
             min: "15",
             max: "45",
             required: true
-        },
-
+        }
+        ,
+        {
+            id: 4,
+            name: "studentGroup",
+            label: "Group",
+            type: "text",
+            required: true
+        }
     ];
 
     const options = courses.map(course => ({ value: course.course_name.toLowerCase(), label: course.course_name }));
@@ -59,11 +75,12 @@ const StudentAdd = () => {
         event.preventDefault();
         dispatch(addNewStudent({
             name: formData.studentName,
+            email: formData.studentEmail,
             age: formData.studentAge,
+            group: formData.studentGroup,
             courses: selectedCourses,
-            className: "545"
         }));
-        toast.success(`${formData.studentName.toUpperCase()} student was added!`, { autoClose: 2000, pauseOnHover: false, hideProgressBar: true });
+        toast.success(`${formData.studentName} student was added!`, { autoClose: 2000, pauseOnHover: false, hideProgressBar: true });
         onClear();
         setFormData(initialState);
     }

@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const slugify = require("slugify");
 const db = require("../config/db");
-const uuid = require('uuid').v4;
 
 /*
     Inserting to DB
@@ -68,6 +67,25 @@ router.get("/:id", (req, res) => {
         return res.status(200).json(result);
     })
 })
+
+
+/* 
+    Get course grades
+*/
+
+router.get("/:id/grades", (req, res) => {
+
+    const { id } = req.params;
+
+    let dbGetQuery = `SELECT * FROM joined_courses WHERE course_id = ?`;
+
+    db.query(dbGetQuery, id, (err, result) => {
+
+        if (err) return res.status(400).json({ msg: "Get course data error" });
+
+        return res.status(200).json(result);
+    })
+});
 
 /*
     Get course students
@@ -148,18 +166,17 @@ router.delete("/delete/student/:studentID", (req, res) => {
 
 router.put("/", (req, res) => {
 
-    const { courseName, students, slug } = req.body;
+    const { courseName, courseId } = req.body;
 
     const newSlug = slugify(courseName).toLowerCase();
 
-    let sqlDbUpdate = `UPDATE courses SET course_name = ?, course_students = ?, slug = ? WHERE slug = ?`;
+    let sqlDbUpdate = `UPDATE courses SET course_name = ?, slug = ? WHERE course_id = ?`;
 
     db.query(sqlDbUpdate,
         [
-            courseName.toLowerCase(),
-            students.toString().toLowerCase(),
+            courseName,
             newSlug,
-            slug
+            courseId
         ],
         (err) => {
             return err

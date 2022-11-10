@@ -14,20 +14,21 @@ import Grades from '../../components/Grades/Grades';
 
 const initialState = {
     studentName: "",
+    studentEmail: "",
     studentAge: 17,
+    studentGroup: "",
     studentCourses: [],
 };
 
 const StudentUpdate = () => {
 
-    const dispatch = useDispatch();
-
     const { pathname } = useLocation();
+    const studentID = pathname.split('/')[pathname.split('/').length - 1];
+
+    const dispatch = useDispatch();
 
     const { currentStudent, loading } = useSelector(state => state.students);
     const { courses } = useSelector(state => state.courses);
-
-    const studentID = pathname.split('/')[pathname.split('/').length - 1];
 
     const [selectedCourses, setSelectedCourses] = useState(null);
 
@@ -51,11 +52,25 @@ const StudentUpdate = () => {
         },
         {
             id: 2,
+            name: "studentEmail",
+            label: "Email",
+            type: "email",
+            required: true
+        },
+        {
+            id: 3,
             name: "studentAge",
             label: "Age",
             type: "number",
             min: "15",
             max: "45",
+            required: true
+        },
+        {
+            id: 4,
+            name: "studentGroup",
+            label: "Group",
+            type: "text",
             required: true
         },
     ];
@@ -65,9 +80,10 @@ const StudentUpdate = () => {
         dispatch(updateStudent({
             id: currentStudent.student_id,
             name: formData.studentName,
+            email: formData.studentEmail,
             age: formData.studentAge,
+            group: formData.studentGroup,
             courses: selectedCourses,
-            className: "545",
         }));
         toast.success("Information about this student was updated!", { autoClose: 2000, pauseOnHover: false, hideProgressBar: true });
     }
@@ -102,7 +118,9 @@ const StudentUpdate = () => {
         currentStudent &&
             setFormData({
                 studentName: currentStudent?.student_name,
+                studentEmail: currentStudent?.student_email,
                 studentAge: currentStudent?.student_age,
+                studentGroup: currentStudent?.student_group,
                 studentCourses: currentStudent?.student_courses
             });
     }, [currentStudent]);

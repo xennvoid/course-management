@@ -6,14 +6,8 @@ const db = require("../config/db");
 
 router.post("/create", (req, res) => {
 
-    const { name, age, courses, className } = req.body;
+    const { name, email, age, group, courses } = req.body;
 
-    //   Simple validation
-    if (!name || !age || !courses || !className) {
-        return res.status(400).json({ msg: "Please enter class name" });
-    }
-
-    // sql for user
     let sqlCheck = `SELECT * from students WHERE slug = ?`;
     let sqlInsertStudent = "INSERT INTO students SET ?;";
 
@@ -27,9 +21,10 @@ router.post("/create", (req, res) => {
 
         const data = {
             student_name: name,
+            student_email: email,
             slug,
-            student_age: age.toString(),
-            student_class: className,
+            student_age: age,
+            student_group: group,
         };
 
         db.query(sqlInsertStudent, data, (err, result) => {
@@ -123,12 +118,10 @@ router.get("/:id/courses", (req, res) => {
 
 router.put("/", (req, res) => {
 
-    const { id, name, age, courses, className } = req.body;
+    const { id, name, email, age, group, courses } = req.body;
     const newSlug = slugify(name).toLowerCase();
 
-    console.log(req.body)
-
-    const updatedata = "UPDATE students SET student_name = ?, student_age = ?, student_class = ?, slug = ? WHERE student_id = ?";
+    const updatedata = "UPDATE students SET student_name = ?, student_email = ?, student_age = ?, student_group = ?, slug = ? WHERE student_id = ?";
 
     let updateCourses = "DELETE FROM joined_courses WHERE student_id = ?;"
 
@@ -138,8 +131,9 @@ router.put("/", (req, res) => {
         updatedata,
         [
             name,
+            email,
             age,
-            className.toLowerCase(),
+            group,
             newSlug,
             id
         ],
@@ -150,11 +144,14 @@ router.put("/", (req, res) => {
 
                 const joinedCourses = courses?.map(course => ({ student_id: id, course_id: course.course_id, grade: course.course_grade }));
 
+                if (joinedCourses?.length === 0)
+                    return res.status(200).json({ name, email, age, group, courses, newSlug, updated: true, id });
+
                 db.query(sqlInsertCourses, [...joinedCourses], (error, result) => {
 
                     if (error) return res.status(400).json({ msg: "Unable to update" });
 
-                    return res.status(200).json({ name, age, courses, className, newSlug, updated: true, id });
+                    return res.status(200).json({ name, email, age, group, courses, newSlug, updated: true, id });
                 });
             });
         }

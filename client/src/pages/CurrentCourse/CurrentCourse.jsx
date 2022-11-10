@@ -16,6 +16,7 @@ const CurrentCourse = () => {
     const dispatch = useDispatch();
     const { currentCourse, loading } = useSelector(state => state.courses);
     const [courseStudents, setCourseStudents] = useState(null);
+    const [studentGrades, setStudentGrades] = useState(null);
 
     useEffect(() => {
         dispatch(getCourseByID(id));
@@ -39,7 +40,7 @@ const CurrentCourse = () => {
 
     const removeStudentFromCourse = async (studentID) => {
 
-        const response = await axios({
+        await axios({
             method: "DELETE",
             url: `http://localhost:5000/api/courses/delete/student/${studentID}`,
             headers: {
@@ -50,6 +51,18 @@ const CurrentCourse = () => {
 
         setCourseStudents(courseStudents => courseStudents.filter(student => student.student_id !== studentID));
     }
+
+    useEffect(() => {
+
+        const getSubscribedStudentsGrades = async () => {
+            const response = await axios.get(`http://localhost:5000/api/courses/${id}/grades`);
+            const res = await response.data;
+            setStudentGrades(res);
+        }
+
+        getSubscribedStudentsGrades();
+
+    }, [courseStudents])
 
     return (
         !loading &&
@@ -69,11 +82,19 @@ const CurrentCourse = () => {
                                     <li
                                         key={student.student_id}
                                         className={styles.students_item}
-                                        onClick={() => removeStudentFromCourse(student.student_id)}
                                     >
                                         <span>{i + 1}.</span>
-                                        {student.student_name}
-                                        <ImCross color="red" cursor="pointer" />
+                                        <NavLink to={`/update/student/${student?.student_id}`} className={styles.link}>
+                                            {student?.student_name}
+                                        </NavLink>
+                                        <p>
+                                            {studentGrades && studentGrades[i]?.grade} points
+                                        </p>
+                                        <ImCross
+                                            color="red"
+                                            cursor="pointer"
+                                            onClick={() => removeStudentFromCourse(student.student_id)}
+                                        />
                                     </li>
                                 )}
                             </ol>
@@ -87,7 +108,7 @@ const CurrentCourse = () => {
             >
                 Delete Course
             </button>
-            <NavLink to={`/update/course/${id}`} className={styles.link}>
+            <NavLink to={`/update/course/${id}`} className={styles.update}>
                 Update course
             </NavLink>
         </div>

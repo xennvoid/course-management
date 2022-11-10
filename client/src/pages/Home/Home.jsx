@@ -10,13 +10,11 @@ const Home = () => {
 
     const controls = [
         { linkTo: 'add/course', text: "Create a new course" },
-        { linkTo: 'add/class', text: "Create a new class" },
         { linkTo: 'add/student', text: "Add a new student" }
     ];
 
     const manageControls = [
         { linkTo: "manage/students", text: "Manage Students" },
-        { linkTo: "/", text: "Manage Classes" },
         { linkTo: "manage/courses", text: "Manage Courses" }
     ];
 
