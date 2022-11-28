@@ -13,6 +13,8 @@ import Grades from '../../components/Grades/Grades';
 
 const initialState = {
     studentName: "",
+    studentSurname: "",
+    studentMiddleName: "",
     studentEmail: "",
     studentAge: 17,
     studentGroup: ""
@@ -34,20 +36,35 @@ const StudentAdd = () => {
         {
             id: 1,
             name: "studentName",
-            label: "Student Name",
+            label: "Student name",
             type: "text",
             pattern: /^[a-zA-Z0-9\s\_]*$/,
             required: true
         },
         {
             id: 2,
+            name: "studentSurname",
+            label: "Student surname",
+            type: "text",
+            pattern: /^[a-zA-Z0-9\s\_]*$/,
+            required: true
+        },
+        {
+            id: 3,
+            name: "studentMiddleName",
+            label: "Student middle name",
+            type: "text",
+            pattern: /^[a-zA-Z0-9\s\_]*$/,
+        },
+        {
+            id: 4,
             name: "studentEmail",
             label: "Email",
             type: "email",
             required: true
         },
         {
-            id: 3,
+            id: 5,
             name: "studentAge",
             label: "Age",
             type: "number",
@@ -57,7 +74,7 @@ const StudentAdd = () => {
         }
         ,
         {
-            id: 4,
+            id: 6,
             name: "studentGroup",
             label: "Group",
             type: "text",
@@ -75,12 +92,15 @@ const StudentAdd = () => {
         event.preventDefault();
         dispatch(addNewStudent({
             name: formData.studentName,
+            surname: formData.studentSurname,
+            middleName: formData.studentMiddleName,
             email: formData.studentEmail,
             age: formData.studentAge,
             group: formData.studentGroup,
             courses: selectedCourses,
         }));
-        toast.success(`${formData.studentName} student was added!`, { autoClose: 2000, pauseOnHover: false, hideProgressBar: true });
+        const fullname = formData.studentName + " " + formData.studentSurname + " " + formData.studentMiddleName;
+        toast.success(`${fullname} student was added!`, { autoClose: 2000, pauseOnHover: false, hideProgressBar: true });
         onClear();
         setFormData(initialState);
     }
@@ -101,7 +121,7 @@ const StudentAdd = () => {
 
     useEffect(() => {
         dispatch(getAllCourses());
-    }, []);
+    }, [dispatch]);
 
     return (
         <>

@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styles from './CourseUpdate.module.scss';
 import { getCourseByID, updateCourse } from '../../store/slices/coursesSlice';
-import { getAllStudents } from '../../store/slices/studentsSlice';
 import Form from '../../components/UI/Form/Form';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
@@ -19,8 +17,6 @@ const CourseUpdate = () => {
 
     const dispatch = useDispatch();
     const { currentCourse, loading } = useSelector(state => state.courses);
-    //const { students } = useSelector(state => state.students);
-    //const [courseStudents, setCourseStudents] = useState(null);
 
     const inputs = [
         {
@@ -35,7 +31,6 @@ const CourseUpdate = () => {
 
     useEffect(() => {
         dispatch(getCourseByID(id));
-        //dispatch(getAllStudents());
     }, []);
 
 

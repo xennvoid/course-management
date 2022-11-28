@@ -29,7 +29,7 @@ const CurrentCourse = () => {
 
         getSubscribedStudents();
 
-    }, []);
+    }, [dispatch]);
 
     const deleteCourse = () => {
         dispatch(deleteStoreCourse(currentCourse.course_id));
@@ -85,8 +85,11 @@ const CurrentCourse = () => {
                                     >
                                         <span>{i + 1}.</span>
                                         <NavLink to={`/update/student/${student?.student_id}`} className={styles.link}>
-                                            {student?.student_name}
+                                            {student?.student_name + " " + student?.student_surname}
                                         </NavLink>
+                                        <p>
+                                            Group: {student?.student_group}
+                                        </p>
                                         <p>
                                             {studentGrades && studentGrades[i]?.grade} points
                                         </p>

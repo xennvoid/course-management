@@ -6,14 +6,15 @@ const db = require("../config/db");
 
 router.post("/create", (req, res) => {
 
-    const { name, email, age, group, courses } = req.body;
+    const { name, surname, middleName, email, age, group, courses } = req.body;
 
     let sqlCheck = `SELECT * from students WHERE slug = ?`;
     let sqlInsertStudent = "INSERT INTO students SET ?;";
 
     let sqlInsertCourses = new Array(courses.length).fill("INSERT INTO joined_courses SET ?;").join('');
 
-    const slug = slugify(name).toLowerCase();
+    const fullName = name + " " + surname + " " + middleName;
+    const slug = slugify(fullName).toLowerCase();
 
     db.query(sqlCheck, slug, async (err, course) => {
         if (course.length > 0)
@@ -21,6 +22,8 @@ router.post("/create", (req, res) => {
 
         const data = {
             student_name: name,
+            student_surname: surname,
+            student_middlename: middleName,
             student_email: email,
             slug,
             student_age: age,
@@ -118,10 +121,12 @@ router.get("/:id/courses", (req, res) => {
 
 router.put("/", (req, res) => {
 
-    const { id, name, email, age, group, courses } = req.body;
-    const newSlug = slugify(name).toLowerCase();
+    const { id, name, surname, middleName, email, age, group, courses } = req.body;
 
-    const updatedata = "UPDATE students SET student_name = ?, student_email = ?, student_age = ?, student_group = ?, slug = ? WHERE student_id = ?";
+    const fullName = name + " " + surname + " " + middleName;
+    const newSlug = slugify(fullName).toLowerCase();
+
+    const updatedata = "UPDATE students SET student_name = ?, student_surname= ?, student_middlename = ?, student_email = ?, student_age = ?, student_group = ?, slug = ? WHERE student_id = ?";
 
     let updateCourses = "DELETE FROM joined_courses WHERE student_id = ?;"
 
@@ -131,6 +136,8 @@ router.put("/", (req, res) => {
         updatedata,
         [
             name,
+            surname,
+            middleName,
             email,
             age,
             group,
@@ -145,13 +152,13 @@ router.put("/", (req, res) => {
                 const joinedCourses = courses?.map(course => ({ student_id: id, course_id: course.course_id, grade: course.course_grade }));
 
                 if (joinedCourses?.length === 0)
-                    return res.status(200).json({ name, email, age, group, courses, newSlug, updated: true, id });
+                    return res.status(200).json({ name, surname, middleName, email, age, group, courses, newSlug, updated: true, id });
 
                 db.query(sqlInsertCourses, [...joinedCourses], (error, result) => {
 
                     if (error) return res.status(400).json({ msg: "Unable to update" });
 
-                    return res.status(200).json({ name, email, age, group, courses, newSlug, updated: true, id });
+                    return res.status(200).json({ name, surname, middleName, email, age, group, courses, newSlug, updated: true, id });
                 });
             });
         }

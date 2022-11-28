@@ -14,6 +14,8 @@ import Grades from '../../components/Grades/Grades';
 
 const initialState = {
     studentName: "",
+    studentSurname: "",
+    studentMiddleName: "",
     studentEmail: "",
     studentAge: 17,
     studentGroup: "",
@@ -36,7 +38,6 @@ const StudentUpdate = () => {
 
     const studentSelectedCoursesOptions = selectedCourses?.map(course => {
         if (course.course_name !== "") return ({ value: course.course_name.toLowerCase(), label: course.course_name });
-        return;
     });
 
     const allCoursesOptions = courses.map(course => ({ value: course.course_name.toLowerCase(), label: course.course_name }));
@@ -52,13 +53,28 @@ const StudentUpdate = () => {
         },
         {
             id: 2,
+            name: "studentSurname",
+            label: "Student surname",
+            type: "text",
+            pattern: /^[a-zA-Z0-9\s\_]*$/,
+            required: true
+        },
+        {
+            id: 3,
+            name: "studentMiddleName",
+            label: "Student middle name",
+            type: "text",
+            pattern: /^[a-zA-Z0-9\s\_]*$/,
+        },
+        {
+            id: 4,
             name: "studentEmail",
             label: "Email",
             type: "email",
             required: true
         },
         {
-            id: 3,
+            id: 5,
             name: "studentAge",
             label: "Age",
             type: "number",
@@ -67,7 +83,7 @@ const StudentUpdate = () => {
             required: true
         },
         {
-            id: 4,
+            id: 6,
             name: "studentGroup",
             label: "Group",
             type: "text",
@@ -80,6 +96,8 @@ const StudentUpdate = () => {
         dispatch(updateStudent({
             id: currentStudent.student_id,
             name: formData.studentName,
+            surname: formData.studentSurname,
+            middleName: formData.studentMiddleName,
             email: formData.studentEmail,
             age: formData.studentAge,
             group: formData.studentGroup,
@@ -118,6 +136,8 @@ const StudentUpdate = () => {
         currentStudent &&
             setFormData({
                 studentName: currentStudent?.student_name,
+                studentSurname: currentStudent?.student_surname,
+                studentMiddleName: currentStudent?.student_middlename,
                 studentEmail: currentStudent?.student_email,
                 studentAge: currentStudent?.student_age,
                 studentGroup: currentStudent?.student_group,

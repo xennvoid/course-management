@@ -24,6 +24,8 @@ const Grades = ({ selectedCourses, setSelectedCourses }) => {
                             type="number"
                             value={selectedCourse.course_grade}
                             onChange={(e) => changeCourseGrade(e.target.value, selectedCourse.course_id)}
+                            min={0}
+                            max={100}
                         />
                     </div>
                 ))

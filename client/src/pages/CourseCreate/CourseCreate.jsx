@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { addCourseToStudentsTable, createCourse } from '../../store/slices/coursesSlice';
+import { createCourse } from '../../store/slices/coursesSlice';
 import styles from './CourseCreate.module.scss';
 
 import { toast } from 'react-toastify';

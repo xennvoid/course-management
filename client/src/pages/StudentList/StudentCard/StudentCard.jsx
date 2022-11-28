@@ -10,7 +10,7 @@ const StudentCard = ({ student }) => {
 
     const dispatch = useDispatch();
 
-    const { student_id, student_name, student_email } = student;
+    const { student_id, student_name, student_surname, student_email } = student;
 
     const navigate = useNavigate();
 
@@ -24,7 +24,7 @@ const StudentCard = ({ student }) => {
         <li className={styles.card}>
             <span className={styles.name} onClick={() => navigate(`/update/student/${student_id}`)}>
                 <span>Name: </span>
-                <span className={styles.value}>{student_name}</span>
+                <span className={styles.value}>{student_name + " " + student_surname}</span>
             </span>
             <span className={styles.age}>
                 <span>Email: </span>
