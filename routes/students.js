@@ -3,6 +3,9 @@ const router = express.Router();
 const slugify = require("slugify");
 const db = require("../config/db");
 
+/**
+    Add student
+**/
 
 router.post("/create", (req, res) => {
 
@@ -169,7 +172,7 @@ router.delete("/:id", (req, res) => {
 
     const { id } = req.params;
 
-    let deleteQuery = "DELETE FROM joined_courses WHERE student_id = ?; DELETE FROM students WHERE student_id = ?;";
+    let deleteQuery = "DELETE FROM students WHERE student_id = ?;"; //DELETE FROM joined_courses WHERE student_id = ?; 
 
     db.query(deleteQuery, [id, id], (err) => {
         if (err) {

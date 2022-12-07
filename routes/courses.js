@@ -126,7 +126,7 @@ router.delete("/", (req, res) => {
 
     const { id } = req.body;
 
-    let sqlDbDelete = "DELETE FROM joined_courses WHERE course_id = ?; DELETE FROM courses WHERE course_id = ?;";
+    let sqlDbDelete = "DELETE FROM courses WHERE course_id = ?;";
 
     db.query(sqlDbDelete, [id, id], (err, results) => {
 
@@ -147,8 +147,6 @@ router.delete("/delete/student/:studentID", (req, res) => {
 
     const { studentID } = req.params;
     const { id } = req.body;
-
-    console.log(studentID, id)
 
     let sqlDbDelete = "DELETE FROM joined_courses WHERE student_id = ? AND course_id = ?;";
 
